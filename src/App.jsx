@@ -16,21 +16,25 @@ const FIREBASE_CONFIG = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const callClaude = async (messages, system = "") => {
-  const body = { model: "claude-sonnet-4-20250514", max_tokens: 4000, messages };
+  const body = { model: "claude-sonnet-4-5", max_tokens: 4000, messages };
   if (system) body.system = system;
   const headers = { "Content-Type": "application/json" };
 
-  // Attach Firebase ID token so the proxy can verify the user
   try {
     const auth  = await loadFirebase();
     const token = await auth.currentUser?.getIdToken();
     if (token) headers["Authorization"] = `Bearer ${token}`;
-  } catch {}
+  } catch(e) {
+    console.warn("Token fetch failed:", e.message);
+  }
 
+  console.log("Calling /api/claude...");
   const res = await fetch("/api/claude", {
     method: "POST", headers, body: JSON.stringify(body),
   });
+  console.log("Response status:", res.status);
   const data = await res.json();
+  console.log("Response data:", JSON.stringify(data).slice(0, 500));
   return data.content?.[0]?.text || "";
 };
 
@@ -181,7 +185,6 @@ function Onboarding({ user, onDone }) {
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
 
   const generate = async () => {
-    console.log("Generate button clicked!");
     if (!form.age || !form.height || !form.weight) { setErr("Please fill age, height and weight."); return; }
     setErr(""); setLoading(true);
     const prompt = `You are a professional strength & conditioning coach. Generate a 7-day progressive overload workout plan in JSON.
