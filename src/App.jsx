@@ -192,11 +192,15 @@ User profile: Goal:${form.goal}, Level:${form.level}, Gender:${form.gender}, Age
 Return ONLY valid JSON, no markdown. Schema:
 {"weekSummary":"...","days":[{"day":"Monday","focus":"...","isRest":false,"exercises":[{"name":"...","targetMuscles":["..."],"sets":4,"reps":"8-10","restSeconds":90,"weightGuidance":"...","description":"...","howTo":"..."}]}]}
 For rest days: isRest:true, exercises:[].`;
-    try {
+   try {
       const txt  = await callClaude([{role:"user",content:prompt}]);
+      console.log("Raw txt:", txt);
       const plan = JSON.parse(txt.replace(/```json|```/g,"").trim());
       onDone(form, plan);
-    } catch { setErr("Failed to generate plan. Please try again."); }
+    } catch(e) { 
+      console.error("Generate error:", e.message);
+      setErr("Failed to generate plan. Please try again."); 
+    }
     setLoading(false);
   };
 
