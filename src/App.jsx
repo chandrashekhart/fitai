@@ -18,14 +18,26 @@ const FIREBASE_CONFIG = {
 //const API_URL = "https://api.anthropic.com/v1/messages";
 const API_URL = "/api/claude";
 const callClaude = async (messages, system = "") => {
-  const body = { model: "claude-sonnet-4-20250514", max_tokens: 4000, messages };
+  const body = { model: "claude-sonnet-4-5", max_tokens: 4000, messages };
   if (system) body.system = system;
+  const headers = { "Content-Type": "application/json" };
+
+  try {
+    const auth  = await loadFirebase();
+    const token = await auth.currentUser?.getIdToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  } catch(e) {
+    console.warn("Token fetch failed:", e.message);
+  }
+
+  console.log("Calling /api/claude...");
   const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    method: "POST", headers, body: JSON.stringify(body),
   });
+
+  console.log("Response status:", res.status);
   const data = await res.json();
+  console.log("Response data:", JSON.stringify(data).slice(0, 500));
   return data.content?.[0]?.text || "";
 };
 
