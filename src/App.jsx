@@ -181,6 +181,7 @@ function Onboarding({ user, onDone }) {
   const set = (k,v) => setForm(f=>({...f,[k]:v}));
 
   const generate = async () => {
+    console.log("Generate button clicked!");
     if (!form.age || !form.height || !form.weight) { setErr("Please fill age, height and weight."); return; }
     setErr(""); setLoading(true);
     const prompt = `You are a professional strength & conditioning coach. Generate a 7-day progressive overload workout plan in JSON.
