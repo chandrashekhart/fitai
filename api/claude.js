@@ -1,4 +1,4 @@
-// File location: fitai/api/claude.cjs
+// File location: fitai/api/claude.js
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -32,12 +32,19 @@ export default async function handler(req, res) {
       }),
     });
 
-    //const data = await response.json();
-    //console.log("Anthropic status:", response.status);
-    //return res.status(response.status).json(data);
-
     const data = await response.json();
-    console.log("Full response:", JSON.stringify(data).slice(0, 500));
+
+    // Strip markdown fences from text responses so JSON.parse works
+    if (data.content?.[0]?.text) {
+      data.content[0].text = data.content[0].text
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
+        .trim();
+    }
+
+    console.log("Anthropic status:", response.status);
+    console.log("Response preview:", JSON.stringify(data).slice(0, 300));
+
     return res.status(response.status).json(data);
 
   } catch (error) {
