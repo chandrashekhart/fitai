@@ -36,6 +36,10 @@ export default async function handler(req, res) {
     console.log("Anthropic status:", response.status);
     return res.status(response.status).json(data);
 
+    const data = await response.json();
+    console.log("Full response:", JSON.stringify(data).slice(0, 500));
+    return res.status(response.status).json(data);
+
   } catch (error) {
     console.error("Proxy error:", error.message);
     return res.status(500).json({ error: error.message });
