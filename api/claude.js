@@ -32,9 +32,9 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
-    console.log("Anthropic status:", response.status);
-    return res.status(response.status).json(data);
+    //const data = await response.json();
+    //console.log("Anthropic status:", response.status);
+    //return res.status(response.status).json(data);
 
     const data = await response.json();
     console.log("Full response:", JSON.stringify(data).slice(0, 500));
